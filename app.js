@@ -22,7 +22,11 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get('get_dtps_all', async function (req, res){
+app.get('/', async function (req, res){
+		return res.status(200).send('God`s in his heaven, all right in the earth')
+})
+
+app.get('/get_dtps_all', async function (req, res){
   const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
   const dbName = "dtp"
   const client = await new MongoClient(mongoUrl);
@@ -30,7 +34,7 @@ app.get('get_dtps_all', async function (req, res){
   const db = await client.db(dbName);
   const collection = db.collection('dtp')
 
-  const dtp2020 = await collection.find().toArray()
+  const dtp2020 = await collection.find({}).toArray()
   return res.status(200).send(JSON.stringify(dtp2020))
 })
 
@@ -42,8 +46,8 @@ app.get('/get_dtps_year', async function (req,res) {
   const db = await client.db(dbName);
   const collection = db.collection('dtp')
   
-  const dtp2020 = await collection.find({year: req.query.year}).toArray()
-  return res.status(200).send(JSON.stringify(dtp2020))
+  const dtp2020 = await collection.find({year: Number(req.query.year)}).toArray()
+	return res.status(200).send(JSON.stringify(dtp2020))
 })
 
 app.get('/get_dtps_month', async function (req,res) {
@@ -54,7 +58,7 @@ app.get('/get_dtps_month', async function (req,res) {
   const db = await client.db(dbName);
   const collection = db.collection('dtp')
   
-  const dtp2020 = await collection.find({year: req.query.year, month: req.query.month}).toArray()
+  const dtp2020 = await collection.find({year: Number(req.query.year), month: Number(req.query.month)}).toArray()
   return res.status(200).send(JSON.stringify(dtp2020))
 })
 
