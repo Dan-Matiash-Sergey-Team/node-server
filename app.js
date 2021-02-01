@@ -34,7 +34,7 @@ app.get('/get_dtp', async function (req, res){
   const db = await client.db(dbName);
   const collection = db.collection('dtp')
 
-  const dtp2020 = await collection.find({id: Number(req.query.id)}).toArray()
+  const dtp2020 = await collection.find({id: Number(req.query.id)}).toArray()[0]
   return res.status(200).send(JSON.stringify(dtp2020))
 })
 
@@ -59,7 +59,7 @@ app.get('/get_dtps_year', async function (req,res) {
   const collection = db.collection("dtpLite")
   
   const dtp2020 = await collection.find({year: Number(req.query.year)}).toArray()
-	return res.status(200).send(JSON.stringify(dtp2020))
+  return res.status(200).send(JSON.stringify(dtp2020))
 })
 
 app.get('/get_dtps_month', async function (req,res) {
