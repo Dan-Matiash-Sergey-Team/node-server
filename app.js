@@ -44,7 +44,7 @@ app.get('/get_dtps_all', async function (req, res){
   const client = await new MongoClient(mongoUrl);
   await client.connect()
   const db = await client.db(dbName);
-  const collection = db.collection("dtpLite")
+  const collection = db.collection("dtpsLite")
 
   const dtp2020 = await collection.find({}).toArray()
   return res.status(200).send(JSON.stringify(dtp2020))
@@ -56,7 +56,7 @@ app.get('/get_dtps_year', async function (req,res) {
   const client = await new MongoClient(mongoUrl);
   await client.connect()
   const db = await client.db(dbName);
-  const collection = db.collection("dtpLite")
+  const collection = db.collection("dtpsLite")
   
   const dtp2020 = await collection.find({year: Number(req.query.year)}).toArray()
   return res.status(200).send(JSON.stringify(dtp2020))
@@ -68,7 +68,7 @@ app.get('/get_dtps_month', async function (req,res) {
   const client = await new MongoClient(mongoUrl);
   await client.connect()
   const db = await client.db(dbName);
-  const collection = db.collection("dtpLite")
+  const collection = db.collection("dtpsLite")
   
   const dtp2020 = await collection.find({year: Number(req.query.year), month: Number(req.query.month)}).toArray()
   return res.status(200).send(JSON.stringify(dtp2020))
