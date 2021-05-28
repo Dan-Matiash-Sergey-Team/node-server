@@ -1,4 +1,3 @@
-
 var express = require('express');
 const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient;
@@ -8,7 +7,9 @@ var app = express();
 
 // view engine setup
 
-app.use(bodyParser.text({type: 'text/*'}))
+app.use(bodyParser.text({
+  type: 'text/*'
+}))
 app.use(bodyParser.json())
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
@@ -22,56 +23,98 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get('/', async function (req, res){
-		return res.status(200).send('God`s in his heaven, all right in the earth')
+app.get('/', async function (req, res) {
+  return res.status(200).send('God`s in his heaven, all right in the earth')
 })
 
-app.get('/get_dtp', async function (req, res){
+app.get('/get_dtp', async function (req, res) {
+  const MongoClient = require('mongodb').MongoClient
   const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
-  const dbName = "dtp"
   const client = await new MongoClient(mongoUrl);
   await client.connect()
-  const db = await client.db(dbName);
-  const collection = db.collection('dtp')
+  const db = await client.db('dtpsFull');
 
-  const dtp2020 = await collection.find({id: Number(req.query.id)}).toArray()[0]
-  return res.status(200).send(JSON.stringify(dtp2020))
+  y = req.query.id.slice(0, 4)
+  m = req.query.id.slice(4, 6)
+
+  let dtpsList = await db.collection(`${y}${m}`).find({"id" : req.query.id}).toArray()
+  return res.status(200).send(JSON.stringify(dtpsList))
 })
 
-app.get('/get_dtps_all', async function (req, res){
+app.get('/get_dtps_all', async function (req, res) {
+  const MongoClient = require('mongodb').MongoClient
   const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
-  const dbName = "dtp"
   const client = await new MongoClient(mongoUrl);
   await client.connect()
-  const db = await client.db(dbName);
-  const collection = db.collection("dtpsLite")
+  const db = await client.db('dtpsLite');
 
-  const dtp2020 = await collection.find({}).toArray()
-  return res.status(200).send(JSON.stringify(dtp2020))
+  let aboba = []
+  for (let y = 2015; y < 2022; y++) {
+    for (let m = 1; m < 13; m++) {
+      aboba.push(db.collection(`${y}${m}`).find({}).toArray())
+    }
+  }
+
+  let dtpsList = []
+  let aw = await Promise.all(aboba)
+  for (let i in aw) {
+    dtpsList = dtpsList.concat(aw[i])
+  }
+  return res.status(200).send(JSON.stringify(dtpsList))
 })
 
-app.get('/get_dtps_year', async function (req,res) {
+app.get('/get_dtps_year', async function (req, res) {
+  const MongoClient = require('mongodb').MongoClient
   const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
-  const dbName = "dtp"
   const client = await new MongoClient(mongoUrl);
   await client.connect()
-  const db = await client.db(dbName);
-  const collection = db.collection("dtpsLite")
+  const db = await client.db('dtpsLite');
+
+  let aboba = []
+  for (let m = 1; m < 13; m++) {
+      aboba.push(db.collection(`${req.query.year}${m}`).find({}).toArray())
+  }
+
+  let dtpsList = []
+  let aw = await Promise.all(aboba)
+  for (let i in aw) {
+      dtpsList = dtpsList.concat(aw[i])
+  }
+  return res.status(200).send(JSON.stringify(dtpsList))
+})
+
+app.get('/get_dtps_all_full', async function (req, res) {
+  const MongoClient = require('mongodb').MongoClient
+  const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
+  const client = await new MongoClient(mongoUrl);
+  await client.connect()
+  const db = await client.db('dtpsFull');
+
+  let aboba = []
+  for (let y = 2015; y < 2022; y++) {
+    for (let m = 1; m < 13; m++) {
+      aboba.push(db.collection(`${y}${m}`).find({}).toArray())
+    }
+  }
+
+  let dtpsList = []
+  let aw = await Promise.all(aboba)
+  for (let i in aw) {
+    dtpsList = dtpsList.concat(aw[i])
+  }
+  return res.status(200).send(JSON.stringify(dtpsList))
+})
+
+app.get('/get_dtps_month', async function (req, res) {
+  const MongoClient = require('mongodb').MongoClient
+  const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
+  const client = await new MongoClient(mongoUrl);
+  await client.connect()
+  const db = await client.db('dtpsLite');
+
+  let dtpsList = await db.collection(`${req.query.year}${req.query.month}`).find({}).toArray()
   
-  const dtp2020 = await collection.find({year: Number(req.query.year)}).toArray()
-  return res.status(200).send(JSON.stringify(dtp2020))
-})
-
-app.get('/get_dtps_month', async function (req,res) {
-  const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
-  const dbName = "dtp"
-  const client = await new MongoClient(mongoUrl);
-  await client.connect()
-  const db = await client.db(dbName);
-  const collection = db.collection("dtpsLite")
-  
-  const dtp2020 = await collection.find({year: Number(req.query.year), month: Number(req.query.month)}).toArray()
-  return res.status(200).send(JSON.stringify(dtp2020))
+  return res.status(200).send(JSON.stringify(dtpsList))
 })
 
 module.exports = app;
