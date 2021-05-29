@@ -51,7 +51,8 @@ app.get('/get_dtps_all', async function (req, res) {
   let aboba = []
   for (let y = 2015; y < 2022; y++) {
     for (let m = 1; m < 13; m++) {
-      aboba.push(db.collection(`${y}${m}`).find({}).toArray())
+      month = m < 10 ? `0${m}` : m
+      aboba.push(db.collection(`${y}${month}`).find({}).toArray())
     }
   }
 
@@ -72,7 +73,8 @@ app.get('/get_dtps_year', async function (req, res) {
 
   let aboba = []
   for (let m = 1; m < 13; m++) {
-      aboba.push(db.collection(`${req.query.year}${m}`).find({}).toArray())
+    month = m < 10 ? `0${m}` : m
+    aboba.push(db.collection(`${y}${month}`).find({}).toArray())
   }
 
   let dtpsList = []
@@ -93,7 +95,8 @@ app.get('/get_dtps_all_full', async function (req, res) {
   let aboba = []
   for (let y = 2015; y < 2022; y++) {
     for (let m = 1; m < 13; m++) {
-      aboba.push(db.collection(`${y}${m}`).find({}).toArray())
+      month = m < 10 ? `0${m}` : m
+      aboba.push(db.collection(`${y}${month}`).find({}).toArray())
     }
   }
 
