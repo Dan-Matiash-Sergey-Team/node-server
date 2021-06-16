@@ -38,6 +38,7 @@ app.get('/get_dtp', async function (req, res) {
   m = req.query.id.slice(4, 6)
 
   let dtpsList = await db.collection(`${y}${m}`).find({"id" : req.query.id}).toArray()
+  client.close()
   return res.status(200).send(JSON.stringify(dtpsList))
 })
 
@@ -61,6 +62,7 @@ app.get('/get_dtps_all', async function (req, res) {
   for (let i in aw) {
     dtpsList = dtpsList.concat(aw[i])
   }
+  client.close()
   return res.status(200).send(JSON.stringify(dtpsList))
 })
 
@@ -74,7 +76,7 @@ app.get('/get_dtps_year', async function (req, res) {
   let aboba = []
   for (let m = 1; m < 13; m++) {
     month = m < 10 ? `0${m}` : m
-    aboba.push(db.collection(`${y}${month}`).find({}).toArray())
+    aboba.push(db.collection(`${req.query.year}${month}`).find({}).toArray())
   }
 
   let dtpsList = []
@@ -82,6 +84,7 @@ app.get('/get_dtps_year', async function (req, res) {
   for (let i in aw) {
       dtpsList = dtpsList.concat(aw[i])
   }
+  client.close()
   return res.status(200).send(JSON.stringify(dtpsList))
 })
 
@@ -105,6 +108,7 @@ app.get('/get_dtps_all_full', async function (req, res) {
   for (let i in aw) {
     dtpsList = dtpsList.concat(aw[i])
   }
+  client.close()
   return res.status(200).send(JSON.stringify(dtpsList))
 })
 
@@ -116,8 +120,25 @@ app.get('/get_dtps_month', async function (req, res) {
   const db = await client.db('dtpsLite');
 
   let dtpsList = await db.collection(`${req.query.year}${req.query.month}`).find({}).toArray()
-  
+  client.close()
   return res.status(200).send(JSON.stringify(dtpsList))
+})
+
+app.get('/remove', async function (req, res) {
+  const MongoClient = require('mongodb').MongoClient
+  const mongoUrl = 'mongodb://universai:cumzone@127.0.0.1:1488'
+  const client = await new MongoClient(mongoUrl);
+  await client.connect()
+  const dbl = await client.db('dtpsLite');
+  const dbf = await client.db('dtpsFull');
+
+  y = req.query.id.slice(0, 4)
+  m = req.query.id.slice(4, 6)
+
+  dbl.collection(`${y}${m}`).deleteOne({"id" : req.query.id})
+  dbf.collection(`${y}${m}`).deleteOne({"id" : req.query.id})
+  client.close()
+  return res.status(200).send(JSON.stringify({"status" : "done"}))
 })
 
 module.exports = app;
